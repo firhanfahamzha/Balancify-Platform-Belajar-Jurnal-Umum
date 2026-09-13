@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Balancify Quest — Petualangan interaktif belajar siklus akuntansi: jurnal umum, buku besar, neraca saldo, dan persamaan dasar akuntansi." />
+<meta property="og:title" content="Balancify Quest — Petualangan Siklus Akuntansi" />
+<meta property="og:description" content="Belajar akuntansi dari nol lewat 5 misi interaktif + boss challenge. Disusun oleh firhan fahamzha." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#6366f1" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚖️</text></svg>" />
+<title>Balancify Quest — Petualangan Siklus Akuntansi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* ============ THEME VARIABLES ============ */
+  :root {
+    --font-head: 'Outfit', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --font-mono: 'Space Grotesk', monospace;
+
+    /* AURORA QUEST (default) */
+    --bg-base: #eef2ff;
+    --glass-bg: rgba(255,255,255,0.55);
+    --glass-panel: rgba(255,255,255,0.78);
+    --glass-border: rgba(255,255,255,0.9);
+    --glass-shadow: 0 10px 40px -10px rgba(99,102,241,0.25);
+    --blur: blur(22px);
+    --radius-sm: 14px;
+    --radius-md: 22px;
+    --radius-lg: 30px;
+
+    --ink: #0f172a;
+    --ink-soft: #64748b;
+    --indigo: #6366f1;
+    --indigo-soft: rgba(99,102,241,0.14);
+    --purple: #a855f7;
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+    --gold: #f59e0b;
+    --gold-soft: rgba(245,158,11,0.16);
+    --green: #10b981;
+    --green-soft: rgba(16,185,129,0.18);
+    --rose: #ef4444;
+    --rose-soft: rgba(239,68,68,0.16);
+    --amber: #d97706;
+    --amber-soft: rgba(217,119,6,0.16);
+    --input-bg: rgba(255,255,255,0.7);
+    --row-hover: rgba(99,102,241,0.06);
+  }
+
+  body[data-theme="profesional"] {
+    --bg-base: #f1f5f9;
+    --glass-bg: #ffffff;
+    --glass-panel: #ffffff;
+    --glass-border: #e2e8f0;
+    --glass-shadow: 0 2px 12px rgba(15,23,42,0.06);
+    --blur: none;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --indigo: #1e293b;
+    --indigo-soft: #e2e8f0;
+    --purple: #334155;
+    --cyan: #0e7490;
+    --pink: #9f1239;
+    --gold: #b45309;
+    --gold-soft: #fef3c7;
+    --input-bg: #ffffff;
+    --row-hover: #f8fafc;
+    --font-head: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  body[data-theme="profesional"] .bg-shape,
+  body[data-theme="profesional"] .emoji { display: none !important; }
+  body[data-theme="profesional"] .glass { backdrop-filter: none; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100vh; overflow-x: hidden; }
+  body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--bg-base);
+    transition: background 0.4s ease, color 0.3s ease;
+    position: relative;
+  }
+  body:not([data-theme="profesional"])::before {
+    content:''; position: fixed; inset:0; z-index:-2; pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 40% at 8% 8%, rgba(168,85,247,0.45), transparent 60%),
+      radial-gradient(ellipse 55% 45% at 92% 10%, rgba(6,182,212,0.4), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(236,72,153,0.32), transparent 60%);
+    animation: auroraShift 18s ease-in-out infinite alternate;
+  }
+  @keyframes auroraShift { 0% { transform: scale(1) rotate(0); } 100% { transform: scale(1.08) rotate(3deg); } }
+  .bg-shape { position: fixed; filter: blur(90px); opacity: 0.55; border-radius: 50%; z-index:-1; pointer-events:none; }
+  .bg-shape-1 { width: 44vw; height: 44vw; background: #c4b5fd; top: -12%; left: -8%; animation: floatY 14s ease-in-out infinite alternate; }
+  .bg-shape-2 { width: 40vw; height: 40vw; background: #67e8f9; bottom: -14%; right: -10%; animation: floatY 16s ease-in-out infinite alternate-reverse; }
+  @keyframes floatY { from { transform: translate(0,0); } to { transform: translate(40px,60px); } }
+
+  #root { min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
+  #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
+  .mono { font-family: var(--font-mono); font-weight: 700; letter-spacing: -0.4px; }
+
+  /* ============ WATERMARK ============ */
+  .watermark {
+    position: fixed; bottom: 20px; right: 20px; z-index: 9990;
+    font-size: 12px; font-weight: 800; letter-spacing: 0.3px;
+    color: var(--ink-soft);
+    background: var(--glass-panel); backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    padding: 8px 14px; border-radius: 999px;
+    box-shadow: var(--glass-shadow);
+    pointer-events: none;
+  }
+
+  /* ============ THEME TOGGLE ============ */
+  .theme-toggle {
+    position: fixed; bottom: 20px; left: 20px; z-index: 9991;
+    padding: 10px 18px; border-radius: 999px;
+    background: var(--glass-panel); backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    font-family: var(--font-head); font-weight: 800; font-size: 13px;
+    color: var(--ink); cursor: pointer; transition: 0.25s;
+    box-shadow: var(--glass-shadow);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .theme-toggle:hover { transform: translateY(-3px); border-color: var(--indigo); color: var(--indigo); }
+
+  /* ============ BUTTONS ============ */
+  .btn { font-family: var(--font-body); font-weight: 800; font-size: 14px; padding: 11px 22px;
+    border-radius: var(--radius-sm); cursor: pointer; border: 1px solid transparent;
+    transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary { background: linear-gradient(135deg, var(--indigo), var(--purple)); color: #fff; box-shadow: 0 8px 20px -8px var(--indigo); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -8px var(--indigo); }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform:none; box-shadow:none; }
+  .btn-outline { background: var(--glass-panel); border-color: var(--glass-border); color: var(--ink); }
+  .btn-outline:hover { border-color: var(--indigo); color: var(--indigo); transform: translateY(-2px); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); }
+  .btn-ghost:hover { background: var(--indigo-soft); color: var(--indigo); }
+  .btn-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #fff; box-shadow: 0 8px 20px -8px var(--gold); }
+  .btn-gold:hover { transform: translateY(-2px); }
+  .btn-danger { background: var(--rose-soft); color: var(--rose); }
+  .btn-danger:hover { background: var(--rose); color: #fff; }
+
+  /* ============ GLASS PANEL ============ */
+  .glass {
+    background: var(--glass-panel); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* ============ LOADER ============ */
+  .loader-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--bg-base); gap: 24px;
+  }
+  .loader-logo { height: 80px; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.85; } }
+  .loader-bar { width: min(280px, 70vw); height: 8px; background: rgba(99,102,241,0.15); border-radius: 999px; overflow: hidden; }
+  .loader-fill { height: 100%; background: linear-gradient(90deg, var(--indigo), var(--purple), var(--cyan)); border-radius: 999px; animation: loadFill 2s ease-out forwards; }
+  @keyframes loadFill { from { width: 0%; } to { width: 100%; } }
+  .loader-text { font-family: var(--font-head); font-weight: 800; color: var(--ink-soft); font-size: 14px; letter-spacing: 1.2px; text-transform: uppercase; }
+
+  /* ============ HERO ============ */
+  .hero { padding: 60px 24px 40px; text-align: center; max-width: 1100px; margin: 0 auto; width: 100%; }
+  .hero-logo { height: 90px; margin-bottom: 24px; }
+  .hero h1 { font-family: var(--font-head); font-size: clamp(34px, 5vw, 62px); font-weight: 900; line-height: 1.05; letter-spacing: -1.5px; margin-bottom: 18px; }
+  .hero h1 .grad { background: linear-gradient(120deg, var(--indigo), var(--purple) 45%, var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: var(--ink-soft); font-size: clamp(15px, 1.6vw, 18px); max-width: 640px; margin: 0 auto 32px; line-height: 1.6; font-weight: 500; }
+  .typing { display: inline-block; min-height: 1.6em; font-weight: 800; color: var(--indigo); border-right: 3px solid var(--indigo); padding-right: 4px; animation: caret 0.9s steps(2) infinite; }
+  @keyframes caret { 50% { border-color: transparent; } }
+  .hero-stats { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 32px 0; }
+  .hero-stat { padding: 16px 22px; text-align: center; min-width: 130px; }
+  .hero-stat .v { font-family: var(--font-head); font-weight: 900; font-size: 26px; color: var(--indigo); }
+  .hero-stat .l { font-size: 11px; color: var(--ink-soft); font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
+
+  /* ============ CONTAINER ============ */
+  .container { max-width: 1180px; margin: 0 auto; padding: 20px 20px 100px; width: 100%; }
+
+  /* ============ TOPBAR ============ */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; margin-bottom: 24px; position: sticky; top: 14px; z-index: 20; }
+  .topbar .brand { display: flex; align-items: center; gap: 12px; }
+  .topbar .brand img { height: 34px; }
+  .topbar .brand .name { font-family: var(--font-head); font-weight: 900; font-size: 18px; letter-spacing: -0.5px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  /* ============ XP BAR & LEVEL ============ */
+  .level-pill { display:flex; align-items:center; gap:10px; padding:8px 14px; border-radius:999px; background: linear-gradient(135deg, var(--indigo), var(--purple)); color:#fff; font-family: var(--font-head); font-weight: 900; box-shadow: 0 6px 16px -6px var(--indigo); }
+  .level-pill .lvl-num { font-size: 18px; }
+  .xp-wrap { display:flex; flex-direction: column; gap:6px; padding: 14px 18px; border-radius: var(--radius-md); }
+  .xp-top { display:flex; justify-content:space-between; font-size: 12px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.6px; }
+  .xp-bar { height: 10px; background: rgba(99,102,241,0.14); border-radius: 999px; overflow: hidden; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #fbbf24); transition: width 0.6s cubic-bezier(0.4,0,0.2,1); border-radius: 999px; }
+
+  /* ============ QUEST MAP ============ */
+  .quest-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .quest-header h2 { font-family: var(--font-head); font-size: clamp(22px, 2.5vw, 32px); font-weight: 900; letter-spacing: -0.6px; }
+  .quest-header p { color: var(--ink-soft); font-weight: 600; font-size: 14px; margin-top: 4px; }
+
+  .quest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; margin-bottom: 40px; }
+  .mission-card {
+    position: relative; padding: 22px; cursor: pointer; transition: 0.3s;
+    display: flex; flex-direction: column; gap: 14px; overflow: hidden;
+  }
+  .mission-card:hover { transform: translateY(-6px); border-color: var(--indigo); }
+  .mission-card::before {
+    content:''; position:absolute; inset:0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(135deg, transparent 60%, rgba(99,102,241,0.08));
+  }
+  .mission-card .m-icon { font-size: 40px; line-height: 1; }
+  .mission-card .m-num { position:absolute; top: 16px; right: 18px; font-family: var(--font-head); font-weight: 900; font-size: 42px; color: rgba(99,102,241,0.12); letter-spacing: -2px; }
+  .mission-card h3 { font-family: var(--font-head); font-size: 18px; font-weight: 800; line-height: 1.25; }
+  .mission-card .m-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.5; flex: 1; }
+  .mission-card .m-tag { display:inline-flex; align-items:center; gap:6px; font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .mission-card.locked { opacity: 0.6; cursor: not-allowed; filter: grayscale(0.4); }
+  .mission-card.locked:hover { transform: none; border-color: var(--glass-border); }
+  .mission-card.done { border-color: var(--green); }
+  .mission-card.done::after {
+    content: '✓'; position: absolute; bottom: 18px; right: 18px;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px;
+    box-shadow: 0 6px 14px -4px var(--green);
+  }
+  .mission-card.boss { border: 2px solid var(--gold); background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(236,72,153,0.05)); }
+
+  /* ============ MISSION VIEW ============ */
+  .mission-view { padding: 26px; }
+  .mission-head { display:flex; align-items:center; gap:16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .mission-head .mh-icon { font-size: 44px; }
+  .mission-head h2 { font-family: var(--font-head); font-size: clamp(22px, 2.6vw, 30px); font-weight: 900; letter-spacing: -0.5px; }
+  .mission-head .mh-sub { color: var(--ink-soft); font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .mission-progress-steps { display: flex; gap: 8px; margin: 20px 0 26px; flex-wrap: wrap; }
+  .mstep { flex: 1; min-width: 120px; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--input-bg); border: 1px solid var(--glass-border); font-size: 13px; font-weight: 800; color: var(--ink-soft); display:flex; align-items:center; gap:8px; }
+  .mstep.active { background: linear-gradient(135deg, var(--indigo), var(--purple)); color: #fff; border-color: transparent; box-shadow: 0 6px 16px -6px var(--indigo); }
+  .mstep.done { background: var(--green-soft); color: var(--green); border-color: transparent; }
+
+  .materi-content { font-size: 15px; line-height: 1.75; color: var(--ink); }
+  .materi-content h3 { font-family: var(--font-head); font-size: 20px; font-weight: 800; margin: 22px 0 10px; }
+  .materi-content p { margin-bottom: 12px; }
+  .materi-content ul { padding-left: 22px; margin-bottom: 12px; }
+  .materi-content li { margin-bottom: 6px; }
+  .materi-content .callout {
+    padding: 16px 20px; border-radius: var(--radius-md); border-left: 5px solid var(--indigo);
+    background: var(--indigo-soft); margin: 18px 0; font-size: 14px;
+  }
+  .materi-content .callout.gold { background: var(--gold-soft); border-color: var(--gold); }
+  .materi-content .callout.green { background: var(--green-soft); border-color: var(--green); }
+  .materi-content table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  .materi-content th { background: var(--indigo-soft); color: var(--indigo); text-align: left; padding: 10px 12px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .materi-content td { padding: 10px 12px; border-bottom: 1px solid var(--glass-border); }
+  .materi-content .mono { color: var(--indigo); }
+
+  /* ============ DRAG & DROP ============ */
+  .dd-wrap { display: grid; grid-template-columns: 1fr 1.3fr; gap: 20px; }
+  @media (max-width: 780px) { .dd-wrap { grid-template-columns: 1fr; } }
+  .dd-pool { padding: 18px; }
+  .dd-pool h4, .dd-col h4 { font-family: var(--font-head); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-soft); margin-bottom: 12px; }
+  .dd-items { display: flex; flex-direction: column; gap: 10px; min-height: 60px; }
+  .dd-chip {
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    background: var(--glass-panel); border: 1px solid var(--glass-border);
+    font-weight: 700; font-size: 14px; cursor: grab;
+    display: flex; align-items: center; gap: 10px; transition: 0.2s;
+  }
+  .dd-chip:hover { transform: translateX(4px); border-color: var(--indigo); }
+  .dd-chip:active { cursor: grabbing; }
+  .dd-chip.correct { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  .dd-chip.wrong { background: var(--rose-soft); border-color: var(--rose); color: var(--rose); }
+  .dd-cols { display: grid; gap: 12px; }
+  .dd-col {
+    padding: 14px; border-radius: var(--radius-md);
+    background: var(--input-bg); border: 2px dashed var(--glass-border); min-height: 120px;
+    transition: 0.2s;
+  }
+  .dd-col.over { border-color: var(--indigo); background: var(--indigo-soft); }
+  .dd-col .zone { display: flex; flex-direction: column; gap: 8px; min-height: 40px; }
+
+  /* ============ FLASHCARD ============ */
+  .flash-card { padding: 40px 30px; text-align: center; position: relative; }
+  .flash-q { font-size: 12px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .flash-acc { font-family: var(--font-head); font-size: clamp(24px, 3vw, 36px); font-weight: 900; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .flash-cat { font-size: 13px; font-weight: 800; color: var(--indigo); padding: 4px 12px; background: var(--indigo-soft); border-radius: 999px; display: inline-block; }
+  .flash-btns { display: flex; gap: 14px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+  .flash-btns button { padding: 16px 40px; font-size: 16px; font-weight: 900; }
+  .flash-progress { display: flex; justify-content: center; gap: 6px; margin-top: 24px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(99,102,241,0.2); }
+  .dot.done { background: var(--green); }
+  .dot.wrong { background: var(--rose); }
+  .dot.now { background: var(--indigo); transform: scale(1.4); }
+
+  /* ============ MINI JOURNAL SIMULATOR ============ */
+  .sim-form { display: flex; flex-direction: column; gap: 16px; }
+  .sim-scenario { padding: 18px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--indigo-soft), rgba(168,85,247,0.08)); border-left: 5px solid var(--indigo); }
+  .sim-scenario .lbl { font-size: 11px; font-weight: 800; color: var(--indigo); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .sim-scenario .txt { font-size: 15px; font-weight: 700; line-height: 1.5; }
+  .sim-row { display: grid; grid-template-columns: 1fr 160px; gap: 12px; align-items: center; }
+  .sim-row.head { grid-template-columns: 1fr 160px; font-size: 12px; color: var(--ink-soft); font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; }
+  select, input[type=text], input[type=number], input[type=date] {
+    width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border); background: var(--input-bg);
+    font-family: var(--font-body); font-size: 14px; font-weight: 600; color: var(--ink);
+    outline: none; transition: 0.2s;
+  }
+  select:focus, input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-soft); }
+  .balance-strip { display:flex; justify-content: space-between; align-items:center; padding: 12px 16px; border-radius: var(--radius-sm); background: var(--input-bg); border: 1px solid var(--glass-border); font-family: var(--font-mono); font-weight: 800; font-size: 13px; }
+  .balance-strip .ok { color: var(--green); }
+  .balance-strip .no { color: var(--rose); }
+
+  /* ============ QUIZ ============ */
+  .quiz-wrap { padding: 26px; }
+  .quiz-q { font-family: var(--font-head); font-size: 18px; font-weight: 800; line-height: 1.4; margin: 12px 0 18px; }
+  .quiz-opt {
+    display:flex; gap:12px; align-items:center; padding: 14px 16px;
+    border-radius: var(--radius-sm); border: 2px solid var(--glass-border);
+    background: var(--input-bg); cursor: pointer; margin-bottom: 10px;
+    font-size: 14px; font-weight: 600; transition: 0.2s;
+  }
+  .quiz-opt:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+  .quiz-opt .mark { width: 26px; height: 26px; border-radius: 50%; background: var(--glass-panel); border: 2px solid var(--glass-border); display:flex; align-items:center; justify-content:center; font-weight: 900; font-size: 13px; color: var(--ink-soft); flex-shrink: 0; }
+  .quiz-opt.correct { border-color: var(--green); background: var(--green-soft); }
+  .quiz-opt.correct .mark { background: var(--green); border-color: var(--green); color: #fff; }
+  .quiz-opt.wrong { border-color: var(--rose); background: var(--rose-soft); }
+  .quiz-opt.wrong .mark { background: var(--rose); border-color: var(--rose); color: #fff; }
+  .quiz-opt.disabled { pointer-events: none; }
+  .quiz-feedback { padding: 14px 18px; border-radius: var(--radius-md); font-size: 14px; line-height: 1.55; margin-top: 14px; }
+  .quiz-feedback.ok { background: var(--green-soft); border-left: 5px solid var(--green); }
+  .quiz-feedback.no { background: var(--rose-soft); border-left: 5px solid var(--rose); }
+
+  /* ============ RESULT & CERTIFICATE ============ */
+  .result-panel { text-align: center; padding: 40px 28px; }
+  .result-panel h2 { font-family: var(--font-head); font-size: 32px; font-weight: 900; letter-spacing: -0.6px; margin-bottom: 8px; }
+  .result-panel .sub { color: var(--ink-soft); font-size: 15px; margin-bottom: 24px; }
+  .result-xp { font-family: var(--font-head); font-size: 52px; font-weight: 900; background: linear-gradient(135deg, var(--gold), #fbbf24); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .badge-grid { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 22px 0; }
+  .badge-item { padding: 12px 18px; border-radius: 999px; background: var(--glass-panel); border: 1px solid var(--glass-border); font-weight: 800; font-size: 13px; display:flex; align-items:center; gap:8px; }
+  .badge-item.gold { background: var(--gold-soft); border-color: var(--gold); color: var(--amber); }
+
+  /* ============ FULL SIMULATOR (Misi 5 / Boss) ============ */
+  .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 1000px) { .sim-grid { grid-template-columns: 1fr; } }
+  .sim-panel { overflow: hidden; }
+  .sim-panel .ph { padding: 16px 20px; border-bottom: 1px solid var(--glass-border); background: var(--glass-bg); display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .sim-panel .ph h3 { font-family: var(--font-head); font-size: 16px; font-weight: 800; }
+  .sim-panel .pb { padding: 18px; }
+  .entry-block { padding: 14px; border-radius: var(--radius-md); background: var(--input-bg); border: 1px solid var(--glass-border); margin-bottom: 14px; }
+  .entry-block .eb-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .entry-block.debit .eb-title { color: var(--indigo); }
+  .entry-block.credit .eb-title { color: var(--amber); }
+  .entry-line { display: grid; grid-template-columns: 1fr 130px 36px; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .icon-mini { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--input-bg); cursor: pointer; font-weight: 900; color: var(--ink-soft); }
+  .icon-mini:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
+
+  .ledger-table, .tb-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ledger-table th, .tb-table th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ink-soft); border-bottom: 2px solid var(--glass-border); }
+  .ledger-table td, .tb-table td { padding: 10px 12px; border-bottom: 1px solid var(--glass-border); font-weight: 600; }
+  .ledger-table tr:hover td, .tb-table tr:hover td { background: var(--row-hover); }
+  .num { text-align: right; }
+  .click-row { cursor: pointer; }
+  .click-row:hover td { color: var(--indigo); font-weight: 800; }
+
+  .pda-eq { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; padding: 20px 0; }
+  .pda-box { padding: 16px 20px; border-radius: var(--radius-md); background: var(--glass-panel); border: 1px solid var(--glass-border); text-align: center; min-width: 120px; cursor: pointer; transition: 0.2s; }
+  .pda-box:hover { transform: translateY(-4px); border-color: var(--indigo); }
+  .pda-box .lbl { font-size: 10px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .pda-box .val { font-family: var(--font-mono); font-weight: 800; font-size: 17px; color: var(--indigo); }
+  .pda-op { font-size: 22px; font-weight: 900; color: var(--ink-soft); }
+
+  .explain-box { padding: 16px 18px; border-radius: var(--radius-md); background: var(--glass-bg); border-left: 5px solid var(--indigo); font-size: 13px; line-height: 1.6; margin-top: 16px; }
+  .explain-box .lbl { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--indigo); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+
+  .tx-item { padding: 12px 14px; border-radius: var(--radius-sm); background: var(--glass-panel); border: 1px solid var(--glass-border); margin-bottom: 10px; }
+  .tx-item .tx-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .tx-date-pill { font-size: 11px; font-weight: 800; color: var(--indigo); background: var(--indigo-soft); padding: 3px 8px; border-radius: 6px; }
+  .tx-desc { font-weight: 700; font-size: 13px; }
+  .tx-entry { display: flex; justify-content: space-between; font-size: 12px; font-family: var(--font-mono); }
+  .tx-entry .d { color: var(--indigo); }
+  .tx-entry .c { color: var(--amber); }
+
+  /* ============ MODAL / DRAWER ============ */
+  .backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.45); backdrop-filter: blur(6px); z-index: 8000; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fade 200ms ease; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .modal { max-width: 520px; width: 100%; padding: 28px; animation: pop 220ms ease; }
+  @keyframes pop { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(620px, 100%); z-index: 8001; padding: 24px; overflow-y: auto; animation: slideIn 260ms ease; display: flex; flex-direction: column; background: var(--bg-base); box-shadow: -10px 0 40px rgba(15,23,42,0.15); }
+  @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  .drawer-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--glass-border); margin-bottom: 18px; }
+  .drawer-head h3 { font-family: var(--font-head); font-size: 22px; font-weight: 900; }
+
+  /* ============ ANIMATIONS ============ */
+  .fade-in { animation: fadeIn 400ms ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .pop-in { animation: pop 300ms ease; }
+  .shake { animation: shake 0.4s; }
+  @keyframes shake { 10%,90% { transform: translateX(-2px); } 20%,80% { transform: translateX(3px); } 30%,50%,70% { transform: translateX(-5px); } 40%,60% { transform: translateX(5px); } }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 640px) {
+    .topbar { flex-wrap: wrap; gap: 10px; top: 8px; padding: 12px 16px; }
+    .topbar .brand .name { display: none; }
+    .hero { padding: 40px 18px 24px; }
+    .hero-logo { height: 64px; }
+    .mission-view { padding: 18px; }
+    .entry-line, .sim-row { grid-template-columns: 1fr 110px 36px; }
+    .sim-row.head { display: none; }
+    .watermark { font-size: 10px; padding: 6px 10px; bottom: 14px; right: 14px; }
+    .theme-toggle { bottom: 14px; left: 14px; padding: 8px 14px; font-size: 12px; }
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="bg-shape bg-shape-1"></div>
+<div class="bg-shape bg-shape-2"></div>
+<div class="watermark"><span class="emoji">⚖️ </span>Balancify Quest · firhan fahamzha</div>
+<canvas id="confetti-canvas"></canvas>
+<div id="root"></div>
+
+<script type="text/babel">
+(() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+/* ============================== UTILS ============================== */
+const fmt = (n) => "Rp " + Math.round(Number(n) || 0).toLocaleString("id-ID");
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+function useLocalStorage(key, init) {
+  const [v, setV] = useState(() => {
+    try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : init; }
+    catch { return init; }
+  });
+  useEffect(() => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }, [key, v]);
+  return [v, setV];
+}
+
+/* ============================== SOUND (Web Audio API) ============================== */
+let audioCtx = null;
+function getCtx() {
+  if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} }
+  return audioCtx;
+}
+function beep(freq, dur, type = 'sine', vol = 0.08, delay = 0) {
+  const ctx = getCtx(); if (!ctx) return;
+  const now = ctx.currentTime + delay;
+  const osc = ctx.createOscillator(); const g = ctx.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  osc.connect(g); g.connect(ctx.destination);
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.exponentialRampToValueAtTime(vol, now + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+  osc.start(now); osc.stop(now + dur + 0.02);
+}
+function playSfx(type, muted) {
+  if (muted) return;
+  switch(type) {
+    case 'click': beep(720, 0.08, 'sine', 0.05); break;
+    case 'correct': beep(523, 0.12, 'sine', 0.09); beep(659, 0.12, 'sine', 0.09, 0.10); beep(784, 0.20, 'sine', 0.09, 0.20); break;
+    case 'wrong': beep(220, 0.18, 'sawtooth', 0.07); beep(160, 0.22, 'sawtooth', 0.06, 0.10); break;
+    case 'drop': beep(500, 0.07, 'triangle', 0.06); break;
+    case 'complete': [523,659,784,1047].forEach((f,i)=>beep(f, 0.22, 'sine', 0.09, i*0.09)); break;
+    case 'unlock': beep(659, 0.14, 'sine', 0.08); beep(1047, 0.25, 'sine', 0.09, 0.14); break;
+    case 'xp': beep(880, 0.06, 'square', 0.04); beep(1320, 0.10, 'square', 0.04, 0.06); break;
+  }
+}
+
+/* ============================== CONFETTI ============================== */
+function fireConfetti() {
+  const c = document.getElementById('confetti-canvas'); if (!c) return;
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  const colors = ['#6366f1','#a855f7','#06b6d4','#ec4899','#f59e0b','#10b981'];
+  const parts = [];
+  for (let i = 0; i < 180; i++) {
+    parts.push({
+      x: Math.random() * c.width,
+      y: -20 - Math.random() * c.height * 0.4,
+      vx: (Math.random() - 0.5) * 7,
+      vy: Math.random() * 3 + 3,
+      s: Math.random() * 8 + 5,
+      col: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI * 2,
+      rs: (Math.random() - 0.5) * 0.25,
+    });
+  }
+  let f = 0;
+  function loop() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.14; p.rot += p.rs;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.col; ctx.fillRect(-p.s/2, -p.s/2, p.s, p.s * 0.55);
+      ctx.restore();
+    });
+    f++;
+    if (f < 220) requestAnimationFrame(loop);
+    else ctx.clearRect(0, 0, c.width, c.height);
+  }
+  loop();
+}
+
+/* ============================== ACCOUNTING CORE ============================== */
+const CATEGORY_META = {
+  ASSET:     { label: "Aset",       defaultNormal: "DEBIT",  prefix: "1" },
+  LIABILITY: { label: "Liabilitas", defaultNormal: "CREDIT", prefix: "2" },
+  EQUITY:    { label: "Ekuitas",    defaultNormal: "CREDIT", prefix: "3" },
+  REVENUE:   { label: "Pendapatan", defaultNormal: "CREDIT", prefix: "4" },
+  EXPENSE:   { label: "Beban",      defaultNormal: "DEBIT",  prefix: "5" },
+};
+
+const PRESET_ACCOUNTS = [
+  { id: "1101", name: "Kas",                       category: "ASSET",     normalBalance: "DEBIT",  startingBalance: 10000000 },
+  { id: "1102", name: "Sewa Dibayar Dimuka",       category: "ASSET",     normalBalance: "DEBIT",  startingBalance: 0 },
+  { id: "1103", name: "Perlengkapan",              category: "ASSET",     normalBalance: "DEBIT",  startingBalance: 0 },
+  { id: "1201", name: "Peralatan",                 category: "ASSET",     normalBalance: "DEBIT",  startingBalance: 0 },
+  { id: "1202", name: "Akum. Penyusutan Peralatan",category: "ASSET",     normalBalance: "CREDIT", startingBalance: 0 },
+  { id: "2101", name: "Utang Usaha",               category: "LIABILITY", normalBalance: "CREDIT", startingBalance: 0 },
+  { id: "3101", name: "Modal Pemilik",             category: "EQUITY",    normalBalance: "CREDIT", startingBalance: 10000000 },
+  { id: "4101", name: "Pendapatan Jasa",           category: "REVENUE",   normalBalance: "CREDIT", startingBalance: 0 },
+  { id: "5101", name: "Beban Gaji",                category: "EXPENSE",   normalBalance: "DEBIT",  startingBalance: 0 },
+];
+
+function nextCode(accounts, category) {
+  const prefix = CATEGORY_META[category].prefix;
+  const used = accounts.filter(a => a.id.startsWith(prefix)).map(a => parseInt(a.id, 10));
+  const base = parseInt(prefix + "100", 10);
+  return String(used.length ? Math.max(...used) + 1 : base + 1);
+}
+
+function generateExplanation(accounts, tx) {
+  const parts = tx.entries.map(e => {
+    const acc = accounts.find(a => a.id === e.accountId); if (!acc) return "";
+    const amount = e.debit || e.credit;
+    const increases = (acc.normalBalance === "DEBIT" && e.debit > 0) || (acc.normalBalance === "CREDIT" && e.credit > 0);
+    const movement = increases ? "bertambah" : "berkurang";
+    return `${CATEGORY_META[acc.category].label} ${acc.name} ${movement} sebesar ${fmt(amount)}`;
+  });
+  const td = tx.entries.reduce((s, e) => s + (e.debit || 0), 0);
+  const tc = tx.entries.reduce((s, e) => s + (e.credit || 0), 0);
+  const diff = td - tc;
+  const closing = Math.abs(diff) < 0.01
+    ? "Sistem mendeteksi debit & kredit seimbang, sehingga Persamaan Dasar Akuntansi tetap terjaga."
+    : `Namun, total debit & kredit tidak seimbang (selisih ${fmt(Math.abs(diff))}). Perbaiki agar laporan valid.`;
+  return `Menganalisis "${tx.description}": ${parts.join("; sementara ")}. ${closing}`;
+}
+
+function calculateTrialBalance(accounts, transactions) {
+  let td = 0, tc = 0;
+  const rows = accounts.map(acc => {
+    let running = acc.startingBalance || 0;
+    transactions.forEach(tx => tx.entries.forEach(e => {
+      if (e.accountId === acc.id) {
+        if (acc.normalBalance === "DEBIT") running += (e.debit || 0) - (e.credit || 0);
+        else running += (e.credit || 0) - (e.debit || 0);
+      }
+    }));
+    let debit = acc.normalBalance === "DEBIT" ? Math.max(running, 0) : 0;
+    let credit = acc.normalBalance === "CREDIT" ? Math.max(running, 0) : 0;
+    if (running < 0) {
+      if (acc.normalBalance === "DEBIT") credit = Math.abs(running);
+      else debit = Math.abs(running);
+    }
+    td += debit; tc += credit;
+    return { ...acc, debit, credit, balance: running, normal: acc.normalBalance };
+  });
+  return { rows, totalDebit: td, totalCredit: tc };
+}
+
+function calculateEquation(tbRows) {
+  let assets = 0, liab = 0, eq = 0, rev = 0, exp = 0;
+  for (const r of tbRows) {
+    if (r.category === "ASSET") { if (r.normal === "CREDIT") assets -= r.balance; else assets += r.balance; }
+    else if (r.category === "LIABILITY") liab += r.balance;
+    else if (r.category === "EQUITY") eq += r.balance;
+    else if (r.category === "REVENUE") rev += r.balance;
+    else if (r.category === "EXPENSE") exp += r.balance;
+  }
+  const adjustedEquity = eq + (rev - exp);
+  return { assets, liabilities: liab, equity: eq, revenue: rev, expenses: exp, adjustedEquity, left: assets, right: liab + adjustedEquity };
+}
+
+function calculateLedger(account, transactions) {
+  let running = account.startingBalance || 0;
+  const rows = [{ date: "-", desc: "Saldo Awal", debit: account.normalBalance === "DEBIT" ? running : 0, credit: account.normalBalance === "CREDIT" ? running : 0, balance: running }];
+  const sorted = [...transactions].sort((a, b) => a.date.localeCompare(b.date) || a.timestamp - b.timestamp);
+  sorted.forEach(tx => tx.entries.forEach(e => {
+    if (e.accountId === account.id) {
+      if (account.normalBalance === "DEBIT") running += (e.debit || 0) - (e.credit || 0);
+      else running += (e.credit || 0) - (e.debit || 0);
+      rows.push({ date: tx.date, desc: tx.description, debit: e.debit || 0, credit: e.credit || 0, balance: running });
+    }
+  }));
+  rows.push({ date: "-", desc: "Saldo Akhir", balance: running, isFinal: true });
+  return rows;
+}
+
+/* ============================== MISSIONS DATA ============================== */
+const MISSIONS = [
+  { id: 1, icon: "⚖️", title: "Persamaan Dasar Akuntansi", subtitle: "Aset = Liabilitas + Ekuitas", color: "#6366f1", xp: 120,
+    desc: "Pahami pondasi akuntansi: setiap transaksi selalu menjaga keseimbangan." },
+  { id: 2, icon: "↔️", title: "Saldo Normal Akun", subtitle: "Debit atau Kredit?", color: "#a855f7", xp: 120,
+    desc: "Kuasai naluri debit/kredit untuk tiap kategori akun." },
+  { id: 3, icon: "📓", title: "Jurnal Umum", subtitle: "Double-Entry Bookkeeping", color: "#06b6d4", xp: 150,
+    desc: "Catat transaksi dengan kaidah pencatatan ganda." },
+  { id: 4, icon: "📚", title: "Buku Besar & Neraca Saldo", subtitle: "Posting & Validasi", color: "#10b981", xp: 150,
+    desc: "Telusuri aliran saldo tiap akun hingga neraca saldo." },
+  { id: 5, icon: "💅", title: "Studi Kasus Salon Cantika", subtitle: "Simulasi Lengkap", color: "#ec4899", xp: 200,
+    desc: "Jurnal 6 transaksi nyata sampai laporan seimbang." },
+];
+
+/* ============================== MISSION 1: PDA (Drag & Drop) ============================== */
+const M1_ITEMS = [
+  { name: "Kas", cat: "ASSET" },
+  { name: "Piutang Usaha", cat: "ASSET" },
+  { name: "Peralatan", cat: "ASSET" },
+  { name: "Perlengkapan", cat: "ASSET" },
+  { name: "Utang Usaha", cat: "LIABILITY" },
+  { name: "Utang Bank", cat: "LIABILITY" },
+  { name: "Modal Pemilik", cat: "EQUITY" },
+  { name: "Prive", cat: "EQUITY" },
+  { name: "Pendapatan Jasa", cat: "REVENUE" },
+];
+
+function Misi1PDA({ onComplete, muted }) {
+  const [pool, setPool] = useState(() => M1_ITEMS.map((x, i) => ({ ...x, id: 'm1_' + i })));
+  const [cols, setCols] = useState({ ASSET: [], LIABILITY: [], EQUITY: [] });
+  const [overCol, setOverCol] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [dragItem, setDragItem] = useState(null);
+
+  const handleDrop = (cat) => {
+    if (!dragItem) return;
+    setPool(pool.filter(p => p.id !== dragItem.id));
+    setCols({ ...cols, [cat]: [...cols[cat], { ...dragItem, placedIn: cat }] });
+    setDragItem(null); setOverCol(null);
+    playSfx('drop', muted);
+  };
+  const removeFrom = (cat, id) => {
+    const item = cols[cat].find(x => x.id === id);
+    setCols({ ...cols, [cat]: cols[cat].filter(x => x.id !== id) });
+    setPool([...pool, { ...item, placedIn: undefined }]);
+  };
+  const totalPlaced = cols.ASSET.length + cols.LIABILITY.length + cols.EQUITY.length;
+  const allPlaced = totalPlaced === M1_ITEMS.length;
+
+  const correctCount = useMemo(() => {
+    let c = 0;
+    ['ASSET','LIABILITY','EQUITY'].forEach(cat => cols[cat].forEach(it => { if (it.cat === cat) c++; }));
+    return c;
+  }, [cols]);
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    const passed = correctCount >= 7;
+    playSfx(passed ? 'correct' : 'wrong', muted);
+    if (passed) setTimeout(() => onComplete(Math.round((correctCount / M1_ITEMS.length) * 100)), 600);
+  };
+
+  const renderChip = (item, source, cat) => {
+    const showResult = submitted;
+    const isCorrect = item.cat === cat;
+    return (
+      <div key={item.id}
+        className={`dd-chip ${showResult && source === 'col' ? (isCorrect ? 'correct' : 'wrong') : ''}`}
+        draggable={source === 'pool' && !submitted}
+        onDragStart={() => setDragItem(item)}
+        onClick={() => source === 'col' && !submitted && removeFrom(cat, item.id)}
+        title={source === 'col' ? 'Klik untuk kembalikan' : 'Tarik ke kolom kanan'}>
+        <span className="emoji">📌</span>{item.name}
+      </div>
+    );
+  };
+
+  return (
+    <div className="fade-in">
+      <p style={{ marginBottom: 16, color: 'var(--ink-soft)', fontWeight: 600, fontSize: 14 }}>
+        🎯 <strong>Tugas:</strong> Tarik (drag) setiap nama akun ke kolom yang tepat — <em>Aset</em>, <em>Liabilitas</em>, atau <em>Ekuitas</em>.
+      </p>
+      <div className="dd-wrap">
+        <div className="glass dd-pool">
+          <h4><span className="emoji">📦 </span>Bank Akun ({pool.length})</h4>
+          <div className="dd-items">
+            {pool.map(it => renderChip(it, 'pool'))}
+            {pool.length === 0 && <div style={{ color: 'var(--ink-soft)', fontSize: 13, fontStyle: 'italic' }}>Semua akun sudah ditempatkan ✓</div>}
+          </div>
+        </div>
+        <div className="dd-cols">
+          {['ASSET','LIABILITY','EQUITY'].map(cat => (
+            <div key={cat}
+              className={`dd-col ${overCol === cat ? 'over' : ''}`}
+              onDragOver={(e) => { e.preventDefault(); setOverCol(cat); }}
+              onDragLeave={() => setOverCol(null)}
+              onDrop={(e) => { e.preventDefault(); handleDrop(cat); }}>
+              <h4>{CATEGORY_META[cat].label} ({cols[cat].length})</h4>
+              <div className="zone">
+                {cols[cat].map(it => renderChip(it, 'col', cat))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {submitted && (
+        <div className={`quiz-feedback ${correctCount >= 7 ? 'ok' : 'no'}`} style={{ marginTop: 18 }}>
+          <strong>Hasil: {correctCount}/{M1_ITEMS.length} benar.</strong> {correctCount >= 7 ? '🎉 Hebat! Pondasi PDA-mu kuat.' : '⚠️ Perlu diulang. Ingat: Prive termasuk Ekuitas (kontra), bukan Beban.'}
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
+        {!submitted
+          ? <button className="btn btn-primary" disabled={!allPlaced} onClick={handleSubmit}>Periksa Jawaban ✓</button>
+          : correctCount < 7
+            ? <button className="btn btn-outline" onClick={() => { setPool(M1_ITEMS.map((x,i)=>({...x,id:'m1_'+i}))); setCols({ASSET:[],LIABILITY:[],EQUITY:[]}); setSubmitted(false); }}>Ulangi</button>
+            : <button className="btn btn-gold" disabled>✓ Misi Selesai</button>}
+      </div>
+    </div>
+  );
+}
+
+/* ============================== MISSION 2: Saldo Normal ============================== */
+const M2_ITEMS = [
+  { name: "Kas", cat: "ASSET", ans: "DEBIT" },
+  { name: "Peralatan", cat: "ASSET", ans: "DEBIT" },
+  { name: "Utang Usaha", cat: "LIABILITY", ans: "CREDIT" },
+  { name: "Modal Pemilik", cat: "EQUITY", ans: "CREDIT" },
+  { name: "Pendapatan Jasa", cat: "REVENUE", ans: "CREDIT" },
+  { name: "Beban Gaji", cat: "EXPENSE", ans: "DEBIT" },
+  { name: "Piutang Usaha", cat: "ASSET", ans: "DEBIT" },
+  { name: "Akum. Penyusutan", cat: "ASSET", ans: "CREDIT" },
+  { name: "Beban Listrik", cat: "EXPENSE", ans: "DEBIT" },
+  { name: "Prive", cat: "EQUITY", ans: "DEBIT" },
+];
+
+function Misi2SaldoNormal({ onComplete, muted }) {
+  const [idx, setIdx] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [flash, setFlash] = useState(null);
+
+  const answer = (val) => {
+    const cur = M2_ITEMS[idx];
+    const isCorrect = cur.ans === val;
+    setFlash(isCorrect ? 'ok' : 'no');
+    playSfx(isCorrect ? 'correct' : 'wrong', muted);
+    setAnswers([...answers, isCorrect]);
+    setTimeout(() => {
+      setFlash(null);
+      if (idx + 1 < M2_ITEMS.length) setIdx(idx + 1);
+      else {
+        const correct = answers.filter(Boolean).length + (isCorrect ? 1 : 0);
+        const passed = correct >= 7;
+        if (passed) onComplete(Math.round((correct / M2_ITEMS.length) * 100));
+      }
+    }, 700);
+  };
+
+  if (idx >= M2_ITEMS.length) {
+    const correct = answers.filter(Boolean).length;
+    return (
+      <div className="glass result-panel fade-in" style={{ maxWidth: 500, margin: '0 auto' }}>
+        <div style={{ fontSize: 60 }}>{correct >= 7 ? '🏆' : '💪'}</div>
+        <h2>{correct}/{M2_ITEMS.length} Benar</h2>
+        <p className="sub">Skor: {Math.round((correct / M2_ITEMS.length) * 100)}%</p>
+        {correct < 7 && <button className="btn btn-outline" onClick={() => { setIdx(0); setAnswers([]); }}>Ulangi</button>}
+      </div>
+    );
+  }
+
+  const cur = M2_ITEMS[idx];
+
+  return (
+    <div className="fade-in">
+      <p style={{ marginBottom: 16, color: 'var(--ink-soft)', fontWeight: 600, fontSize: 14 }}>
+        🎯 <strong>Tugas:</strong> Tentukan saldo normal akun berikut — Debit atau Kredit?
+      </p>
+      <div className={`glass flash-card ${flash === 'no' ? 'shake' : ''}`}>
+        <div className="flash-q">Akun {idx + 1} dari {M2_ITEMS.length}</div>
+        <div className="flash-acc">{cur.name}</div>
+        <div className="flash-cat">{CATEGORY_META[cur.cat].label}</div>
+        <div className="flash-btns">
+          <button className="btn btn-primary" onClick={() => answer('DEBIT')} disabled={flash !== null}>DEBIT</button>
+          <button className="btn btn-outline" onClick={() => answer('CREDIT')} disabled={flash !== null}>KREDIT</button>
+        </div>
+        {flash === 'ok' && <div style={{ marginTop: 18, color: 'var(--green)', fontWeight: 800 }}>✓ Tepat sekali!</div>}
+        {flash === 'no' && <div style={{ marginTop: 18, color: 'var(--rose)', fontWeight: 800 }}>✗ Jawaban benar: {cur.ans}</div>}
+        <div className="flash-progress">
+          {M2_ITEMS.map((_, i) => (
+            <div key={i} className={`dot ${i < answers.length ? (answers[i] ? 'done' : 'wrong') : i === idx ? 'now' : ''}`} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== MISSION 3: Mini Jurnal ============================== */
+const M3_CASES = [
+  {
+    prompt: "Tuan Budi menyetorkan uang tunai Rp 20.000.000 sebagai modal awal usaha.",
+    correct: [
+      { accId: '1101', side: 'D', amount: 20000000 },
+      { accId: '3101', side: 'C', amount: 20000000 },
+    ],
+  },
+  {
+    prompt: "Membeli peralatan kantor secara tunai sebesar Rp 5.000.000.",
+    correct: [
+      { accId: '1201', side: 'D', amount: 5000000 },
+      { accId: '1101', side: 'C', amount: 5000000 },
+    ],
+  },
+  {
+    prompt: "Menyelesaikan jasa dan menerima pembayaran tunai Rp 3.500.000.",
+    correct: [
+      { accId: '1101', side: 'D', amount: 3500000 },
+      { accId: '4101', side: 'C', amount: 3500000 },
+    ],
+  },
+  {
+    prompt: "Membayar gaji karyawan Rp 1.200.000 secara tunai.",
+    correct: [
+      { accId: '5101', side: 'D', amount: 1200000 },
+      { accId: '1101', side: 'C', amount: 1200000 },
+    ],
+  },
+];
+
+function Misi3Jurnal({ onComplete, muted }) {
+  const [idx, setIdx] = useState(0);
+  const [debitAcc, setDebitAcc] = useState('');
+  const [debitAmt, setDebitAmt] = useState('');
+  const [creditAcc, setCreditAcc] = useState('');
+  const [creditAmt, setCreditAmt] = useState('');
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+
+  const accounts = PRESET_ACCOUNTS;
+  const td = Number(debitAmt) || 0, tc = Number(creditAmt) || 0;
+  const balanced = Math.abs(td - tc) < 0.01 && td > 0;
+
+  const check = () => {
+    const c = M3_CASES[idx];
+    const ok = c.correct.every(e => {
+      if (e.side === 'D') return e.accId === debitAcc && e.amount === td;
+      return e.accId === creditAcc && e.amount === tc;
+    }) && c.correct.length === 2;
+    setFeedback(ok ? 'ok' : 'no');
+    playSfx(ok ? 'correct' : 'wrong', muted);
+    if (ok) setScore(score + 1);
+    setTimeout(() => {
+      setFeedback(null);
+      if (idx + 1 < M3_CASES.length) {
+        setIdx(idx + 1); setDebitAcc(''); setDebitAmt(''); setCreditAcc(''); setCreditAmt('');
+      } else {
+        const finalScore = ok ? score + 1 : score;
+        if (finalScore >= 3) onComplete(Math.round((finalScore / M3_CASES.length) * 100));
+      }
+    }, 900);
+  };
+
+  if (idx >= M3_CASES.length) {
+    return (
+      <div className="glass result-panel fade-in">
+        <div style={{ fontSize: 60 }}>{score >= 3 ? '🎉' : '💪'}</div>
+        <h2>{score}/{M3_CASES.length} Benar</h2>
+        <button className="btn btn-outline" style={{ marginTop: 16 }} onClick={() => { setIdx(0); setScore(0); }}>Ulangi</button>
+      </div>
+    );
+  }
+
+  const c = M3_CASES[idx];
+
+  return (
+    <div className="fade-in">
+      <p style={{ marginBottom: 16, color: 'var(--ink-soft)', fontWeight: 600, fontSize: 14 }}>
+        🎯 <strong>Tugas:</strong> Jurnal transaksi berikut. Pilih akun debit & kredit beserta nominalnya.
+      </p>
+      <div className="sim-form">
+        <div className="sim-scenario">
+          <div className="lbl">Kasus {idx + 1} dari {M3_CASES.length}</div>
+          <div className="txt">{c.prompt}</div>
+        </div>
+        <div className="entry-block debit">
+          <div className="eb-title">📘 Debit</div>
+          <div className="sim-row">
+            <select value={debitAcc} onChange={e => setDebitAcc(e.target.value)}>
+              <option value="">— Pilih Akun —</option>
+              {accounts.map(a => <option key={a.id} value={a.id}>{a.id} · {a.name}</option>)}
+            </select>
+            <input type="number" placeholder="Nominal" value={debitAmt} onChange={e => setDebitAmt(e.target.value)} />
+          </div>
+        </div>
+        <div className="entry-block credit">
+          <div className="eb-title">📙 Kredit</div>
+          <div className="sim-row">
+            <select value={creditAcc} onChange={e => setCreditAcc(e.target.value)}>
+              <option value="">— Pilih Akun —</option>
+              {accounts.map(a => <option key={a.id} value={a.id}>{a.id} · {a.name}</option>)}
+            </select>
+            <input type="number" placeholder="Nominal" value={creditAmt} onChange={e => setCreditAmt(e.target.value)} />
+          </div>
+        </div>
+        <div className="balance-strip">
+          <span>Debit: {fmt(td)} | Kredit: {fmt(tc)}</span>
+          <span className={balanced ? 'ok' : 'no'}>{balanced ? '✅ Balance' : '⚠️ Belum balance'}</span>
+        </div>
+        {feedback && <div className={`quiz-feedback ${feedback}`}>{feedback === 'ok' ? '✓ Tepat sekali! +1' : '✗ Coba cek lagi: pastikan akun & nominal tepat.'}</div>}
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <button className="btn btn-primary" disabled={!debitAcc || !creditAcc || !balanced || feedback !== null} onClick={check}>Periksa</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== MISSION 4: Buku Besar ============================== */
+const M4_TX = [
+  { id: 't1', date: '2024-01-02', timestamp: 1, description: "Setoran modal awal", entries: [{ accountId: '1101', debit: 20000000, credit: 0 }, { accountId: '3101', debit: 0, credit: 20000000 }] },
+  { id: 't2', date: '2024-01-05', timestamp: 2, description: "Beli peralatan tunai", entries: [{ accountId: '1201', debit: 5000000, credit: 0 }, { accountId: '1101', debit: 0, credit: 5000000 }] },
+  { id: 't3', date: '2024-01-10', timestamp: 3, description: "Pendapatan jasa tunai", entries: [{ accountId: '1101', debit: 3500000, credit: 0 }, { accountId: '4101', debit: 0, credit: 3500000 }] },
+  { id: 't4', date: '2024-01-15', timestamp: 4, description: "Bayar gaji", entries: [{ accountId: '5101', debit: 1200000, credit: 0 }, { accountId: '1101', debit: 0, credit: 1200000 }] },
+];
+const M4_ACCOUNTS = PRESET_ACCOUNTS.map(a => ({ ...a, startingBalance: 0 }));
+
+const M4_QUESTIONS = [
+  { q: "Berapa saldo akhir akun Kas?", opts: [fmt(17300000), fmt(20000000), fmt(18500000), fmt(1200000)], a: 0, exp: "Modal 20jt + Pendapatan 3,5jt − Peralatan 5jt − Gaji 1,2jt = Rp 17.300.000." },
+  { q: "Akun mana yang memiliki saldo normal DEBIT dengan saldo akhir terbesar?", opts: ["Peralatan", "Kas", "Beban Gaji", "Modal Pemilik"], a: 1, exp: "Kas punya saldo debit Rp 17,3jt — lebih besar dari Peralatan Rp 5jt & Beban Rp 1,2jt." },
+  { q: "Apakah Neraca Saldo dari 4 transaksi ini seimbang?", opts: ["Ya, seimbang", "Tidak, selisih Rp 1jt", "Tidak, selisih Rp 500rb", "Tidak bisa ditentukan"], a: 0, exp: "Setiap transaksi double-entry, sehingga total debit = total kredit = Rp 29.500.000." },
+];
+
+function Misi4Ledger({ onComplete, muted }) {
+  const [ledgerAcc, setLedgerAcc] = useState(null);
+  const [qIdx, setQIdx] = useState(0);
+  const [picked, setPicked] = useState(null);
+  const [score, setScore] = useState(0);
+  const [showDrawer, setShowDrawer] = useState(false);
+
+  const tb = useMemo(() => calculateTrialBalance(M4_ACCOUNTS, M4_TX), []);
+  const eq = useMemo(() => calculateEquation(tb.rows), [tb]);
+  const isBal = Math.abs(tb.totalDebit - tb.totalCredit) < 0.01;
+
+  const answered = picked !== null;
+
+  const pickAnswer = (i) => {
+    if (answered) return;
+    setPicked(i);
+    const q = M4_QUESTIONS[qIdx];
+    const ok = i === q.a;
+    playSfx(ok ? 'correct' : 'wrong', muted);
+    if (ok) setScore(score + 1);
+    setTimeout(() => {
+      setPicked(null);
+      if (qIdx + 1 < M4_QUESTIONS.length) setQIdx(qIdx + 1);
+      else {
+        const fs = ok ? score + 1 : score;
+        if (fs >= 2) onComplete(Math.round((fs / M4_QUESTIONS.length) * 100));
+      }
+    }, 1200);
+  };
+
+  const ledgerData = ledgerAcc ? calculateLedger(M4_ACCOUNTS.find(a => a.id === ledgerAcc), M4_TX) : null;
+
+  return (
+    <div className="fade-in">
+      <p style={{ marginBottom: 16, color: 'var(--ink-soft)', fontWeight: 600, fontSize: 14 }}>
+        🎯 <strong>Tugas:</strong> Telusuri Neraca Saldo & Buku Besar. Klik nama akun untuk melihat mutasinya.
+      </p>
+
+      <div className="glass sim-panel" style={{ marginBottom: 20 }}>
+        <div className="ph">
+          <h3>📊 Neraca Saldo</h3>
+          <span style={{ fontSize: 12, fontWeight: 800, padding: '5px 12px', borderRadius: 999, background: isBal ? 'var(--green-soft)' : 'var(--rose-soft)', color: isBal ? 'var(--green)' : 'var(--rose)' }}>
+            {isBal ? '✅ Balance' : '⚠️ Unbalanced'}
+          </span>
+        </div>
+        <div className="pb" style={{ overflowX: 'auto' }}>
+          <table className="tb-table">
+            <thead><tr><th>Kode</th><th>Akun</th><th className="num">Debit</th><th className="num">Kredit</th></tr></thead>
+            <tbody>
+              {tb.rows.filter(r => r.debit || r.credit).map(r => (
+                <tr key={r.id} className="click-row" onClick={() => { setLedgerAcc(r.id); setShowDrawer(true); }}>
+                  <td className="mono">{r.id}</td><td>{r.name}</td>
+                  <td className="num mono">{r.debit ? fmt(r.debit) : '-'}</td>
+                  <td className="num mono">{r.credit ? fmt(r.credit) : '-'}</td>
+                </tr>
+              ))}
+              <tr style={{ borderTop: '2px solid var(--indigo)', fontWeight: 900 }}>
+                <td colSpan="2">TOTAL</td>
+                <td className="num mono" style={{ color: 'var(--indigo)' }}>{fmt(tb.totalDebit)}</td>
+                <td className="num mono" style={{ color: 'var(--indigo)' }}>{fmt(tb.totalCredit)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div className="pda-eq" style={{ marginTop: 10 }}>
+            <div className="pda-box"><div className="lbl">Aset</div><div className="val">{fmt(eq.assets)}</div></div>
+            <div className="pda-op">=</div>
+            <div className="pda-box"><div className="lbl">Liabilitas</div><div className="val">{fmt(eq.liabilities)}</div></div>
+            <div className="pda-op">+</div>
+            <div className="pda-box"><div className="lbl">Ekuitas</div><div className="val">{fmt(eq.adjustedEquity)}</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="glass quiz-wrap">
+        <div style={{ fontSize: 11, fontWeight: 900, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: 1 }}>
+          Pertanyaan {qIdx + 1} / {M4_QUESTIONS.length}
+        </div>
+        <div className="quiz-q">{M4_QUESTIONS[qIdx].q}</div>
+        {M4_QUESTIONS[qIdx].opts.map((o, i) => (
+          <div key={i}
+            className={`quiz-opt ${answered ? 'disabled' : ''} ${answered && i === M4_QUESTIONS[qIdx].a ? 'correct' : ''} ${answered && i === picked && i !== M4_QUESTIONS[qIdx].a ? 'wrong' : ''}`}
+            onClick={() => pickAnswer(i)}>
+            <div className="mark">{String.fromCharCode(65 + i)}</div>
+            <div>{o}</div>
+          </div>
+        ))}
+        {answered && (
+          <div className={`quiz-feedback ${picked === M4_QUESTIONS[qIdx].a ? 'ok' : 'no'}`}>
+            <strong>{picked === M4_QUESTIONS[qIdx].a ? '✓ Benar! ' : '✗ Belum tepat. '}</strong>
+            {M4_QUESTIONS[qIdx].exp}
+          </div>
+        )}
+      </div>
+
+      {showDrawer && ledgerData && (
+        <div className="backdrop" onClick={() => setShowDrawer(false)}>
+          <div className="drawer" onClick={e => e.stopPropagation()}>
+            <div className="drawer-head">
+              <div>
+                <h3>{M4_ACCOUNTS.find(a => a.id === ledgerAcc).name}</h3>
+                <div style={{ color: 'var(--ink-soft)', fontSize: 13, fontWeight: 700, marginTop: 4 }}>{ledgerAcc} · {CATEGORY_META[M4_ACCOUNTS.find(a => a.id === ledgerAcc).category].label}</div>
+              </div>
+              <button className="icon-mini" onClick={() => setShowDrawer(false)}>×</button>
+            </div>
+            <table className="ledger-table">
+              <thead><tr><th>Tgl</th><th>Keterangan</th><th className="num">Debit</th><th className="num">Kredit</th><th className="num">Saldo</th></tr></thead>
+              <tbody>
+                {ledgerData.map((r, i) => (
+                  <tr key={i} style={r.isFinal ? { borderTop: '2px dashed var(--indigo)', fontWeight: 900 } : {}}>
+                    <td className="mono" style={{ fontSize: 11 }}>{r.date}</td>
+                    <td>{r.desc}</td>
+                    <td className="num mono">{r.debit ? fmt(r.debit) : '-'}</td>
+                    <td className="num mono">{r.credit ? fmt(r.credit) : '-'}</td>
+                    <td className="num mono" style={{ color: 'var(--indigo)' }}>{fmt(r.balance)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================== MISSION 5 / BOSS: Full Simulator ============================== */
+const M5_CASES = [
+  { date: '2024-02-01', desc: "Setoran modal awal tunai", debit: '1101', kredit: '3101', amount: 25000000 },
+  { date: '2024-02-03', desc: "Beli peralatan salon tunai", debit: '1201', kredit: '1101', amount: 8000000 },
+  { date: '2024-02-05', desc: "Beli perlengkapan kredit", debit: '1103', kredit: '2101', amount: 2000000 },
+  { date: '2024-02-08', desc: "Pendapatan jasa tunai", debit: '1101', kredit: '4101', amount: 4500000 },
+  { date: '2024-02-12', desc: "Bayar utang usaha", debit: '2101', kredit: '1101', amount: 1500000 },
+  { date: '2024-02-20', desc: "Bayar beban gaji", debit: '5101', kredit: '1101', amount: 1800000 },
+];
+
+function Misi5FullSim({ onComplete, muted, isBoss }) {
+  const [step, setStep] = useState(0);
+  const [debitAcc, setDebitAcc] = useState('');
+  const [creditAcc, setCreditAcc] = useState('');
+  const [amount, setAmount] = useState('');
+  const [transactions, setTransactions] = useState([]);
+  const [feedback, setFeedback] = useState(null);
+  const [mistakes, setMistakes] = useState(0);
+
+  const currentCase = M5_CASES[step];
+
+  const submit = () => {
+    const amt = Number(amount);
+    const ok = debitAcc === currentCase.debit && creditAcc === currentCase.kredit && Math.abs(amt - currentCase.amount) < 0.01;
+    if (ok) {
+      setFeedback('ok');
+      playSfx('correct', muted);
+      const tx = {
+        id: uid(), date: currentCase.date, timestamp: Date.now(),
+        description: currentCase.desc,
+        entries: [
+          { accountId: debitAcc, debit: amt, credit: 0 },
+          { accountId: creditAcc, debit: 0, credit: amt },
+        ]
+      };
+      setTransactions([...transactions, tx]);
+      setTimeout(() => {
+        setFeedback(null);
+        if (step + 1 < M5_CASES.length) {
+          setStep(step + 1); setDebitAcc(''); setCreditAcc(''); setAmount('');
+        } else {
+          // finish
+          const final = Math.max(0, Math.round(((M5_CASES.length - mistakes) / M5_CASES.length) * 100));
+          onComplete(final, [...transactions, tx]);
+        }
+      }, 700);
+    } else {
+      setFeedback('no');
+      setMistakes(mistakes + 1);
+      playSfx('wrong', muted);
+      setTimeout(() => setFeedback(null), 1400);
+    }
+  };
+
+  const tb = useMemo(() => calculateTrialBalance(PRESET_ACCOUNTS, transactions), [transactions]);
+  const isBal = Math.abs(tb.totalDebit - tb.totalCredit) < 0.01;
+
+  if (step >= M5_CASES.length) return null;
+
+  return (
+    <div className="fade-in">
+      <p style={{ marginBottom: 16, color: 'var(--ink-soft)', fontWeight: 600, fontSize: 14 }}>
+        🎯 <strong>{isBoss ? 'BOSS CHALLENGE' : 'Tugas'}:</strong> Jurnal 6 transaksi Salon Cantika secara berurutan. Sistem memvalidasi setiap entri.
+      </p>
+
+      <div className="sim-grid">
+        <div className="glass sim-panel">
+          <div className="ph">
+            <h3>📝 Kasus {step + 1} / {M5_CASES.length}</h3>
+            <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--ink-soft)' }}>{currentCase.date}</span>
+          </div>
+          <div className="pb">
+            <div className="sim-scenario" style={{ marginBottom: 16 }}>
+              <div className="lbl">Transaksi</div>
+              <div className="txt">{currentCase.desc}</div>
+              <div style={{ marginTop: 8, fontSize: 13, color: 'var(--ink-soft)' }}>Nominal: <strong>{fmt(currentCase.amount)}</strong></div>
+            </div>
+            <div className="entry-block debit">
+              <div className="eb-title">📘 Debit</div>
+              <select value={debitAcc} onChange={e => setDebitAcc(e.target.value)}>
+                <option value="">— Pilih Akun Debit —</option>
+                {PRESET_ACCOUNTS.map(a => <option key={a.id} value={a.id}>{a.id} · {a.name}</option>)}
+              </select>
+            </div>
+            <div className="entry-block credit">
+              <div className="eb-title">📙 Kredit</div>
+              <select value={creditAcc} onChange={e => setCreditAcc(e.target.value)}>
+                <option value="">— Pilih Akun Kredit —</option>
+                {PRESET_ACCOUNTS.map(a => <option key={a.id} value={a.id}>{a.id} · {a.name}</option>)}
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 }}>Nominal</label>
+              <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Masukkan nominal" />
+            </div>
+            {feedback === 'ok' && <div className="quiz-feedback ok">✓ Tepat! Entri tercatat.</div>}
+            {feedback === 'no' && <div className="quiz-feedback no">✗ Belum tepat. Cek akun & nominal. (Kesalahan: {mistakes + 1})</div>}
+            <button className="btn btn-primary" style={{ width: '100%', marginTop: 12, padding: 14 }}
+              disabled={!debitAcc || !creditAcc || !amount || feedback === 'ok'} onClick={submit}>
+              Simpan Entri
+            </button>
+          </div>
+        </div>
+
+        <div className="glass sim-panel">
+          <div className="ph">
+            <h3>📊 Neraca Saldo Live</h3>
+            <span style={{ fontSize: 12, fontWeight: 800, padding: '5px 12px', borderRadius: 999, background: isBal ? 'var(--green-soft)' : 'var(--rose-soft)', color: isBal ? 'var(--green)' : 'var(--rose)' }}>
+              {isBal ? '✅ Balance' : '⚠️ Unbalanced'}
+            </span>
+          </div>
+          <div className="pb" style={{ overflowX: 'auto', maxHeight: 420 }}>
+            <table className="tb-table">
+              <thead><tr><th>Akun</th><th className="num">Debit</th><th className="num">Kredit</th></tr></thead>
+              <tbody>
+                {tb.rows.filter(r => r.debit || r.credit).map(r => (
+                  <tr key={r.id}>
+                    <td><span className="mono" style={{ color: 'var(--ink-soft)', fontSize: 11, marginRight: 6 }}>{r.id}</span>{r.name}</td>
+                    <td className="num mono">{r.debit ? fmt(r.debit) : '-'}</td>
+                    <td className="num mono">{r.credit ? fmt(r.credit) : '-'}</td>
+                  </tr>
+                ))}
+                {tb.rows.filter(r => r.debit || r.credit).length === 0 && (
+                  <tr><td colSpan="3" style={{ textAlign: 'center', color: 'var(--ink-soft)', fontStyle: 'italic', padding: 30 }}>Belum ada transaksi.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== CERTIFICATE ============================== */
+function downloadCertificate({ name, xp, level, badges }) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('l', 'mm', 'a4');
+  const W = 297, H = 210;
+  // Background
+  doc.setFillColor(248, 250, 255); doc.rect(0, 0, W, H, 'F');
+  // Border
+  doc.setDrawColor(99, 102, 241); doc.setLineWidth(2);
+  doc.rect(10, 10, W - 20, H - 20);
+  doc.setLineWidth(0.5); doc.rect(14, 14, W - 28, H - 28);
+  // Title
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(34); doc.setTextColor(99, 102, 241);
+  doc.text('SERTIFIKAT PENYELESAIAN', W / 2, 48, { align: 'center' });
+  doc.setFontSize(14); doc.setTextColor(120, 120, 140);
+  doc.text('Balancify Quest - Petualangan Siklus Akuntansi', W / 2, 60, { align: 'center' });
+  // Divider
+  doc.setDrawColor(168, 85, 247); doc.setLineWidth(0.8); doc.line(70, 68, W - 70, 68);
+  // Body
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(13); doc.setTextColor(60, 60, 80);
+  doc.text('Diberikan kepada:', W / 2, 86, { align: 'center' });
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(30); doc.setTextColor(15, 23, 42);
+  doc.text(name || 'Peserta Balancify', W / 2, 104, { align: 'center' });
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(80, 80, 100);
+  const bodyText = 'Telah berhasil menyelesaikan seluruh 5 misi dan Boss Challenge dalam Balancify Quest,\nmenguasai Persamaan Dasar Akuntansi, Saldo Normal Akun, Jurnal Umum, Buku Besar,\ndan Neraca Saldo secara terstruktur.';
+  doc.text(bodyText, W / 2, 124, { align: 'center' });
+  // Stats
+  doc.setFontSize(11); doc.setTextColor(99, 102, 241);
+  doc.text(`Level: ${level}   |   Total XP: ${xp}   |   Badge: ${badges}`, W / 2, 148, { align: 'center' });
+  // Footer
+  doc.setFontSize(10); doc.setTextColor(120, 120, 140);
+  doc.text(`Diterbitkan: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`, 30, 185);
+  doc.text('Balancify Quest by firhan fahamzha', W - 30, 185, { align: 'right' });
+  doc.save(`Sertifikat_Balancify_Quest_${(name || 'Peserta').replace(/\s+/g, '_')}.pdf`);
+}
+
+/* ============================== REUSABLE UI ============================== */
+function LevelPill({ xp, level }) {
+  return (
+    <div className="level-pill">
+      <span className="emoji">🏅</span>
+      <span>LV</span>
+      <span className="lvl-num">{level}</span>
+    </div>
+  );
+}
+
+function XPBar({ xp }) {
+  const level = Math.floor(xp / 300) + 1;
+  const next = level * 300;
+  const cur = xp - (level - 1) * 300;
+  const pct = Math.min(100, (cur / 300) * 100);
+  return (
+    <div className="glass xp-wrap" style={{ padding: '10px 16px', minWidth: 180 }}>
+      <div className="xp-top"><span>XP {xp}</span><span>{cur}/300</span></div>
+      <div className="xp-bar"><div className="xp-fill" style={{ width: pct + '%' }} /></div>
+    </div>
+  );
+}
+
+/* ============================== LOADER ============================== */
+function LoaderScreen() {
+  return (
+    <div className="loader-screen">
+      <img src="logo.png" alt="Balancify" className="loader-logo" onError={(e) => { e.target.replaceWith(Object.assign(document.createElement('div'), { style: 'font-size:70px', innerText: '⚖️' })); }} />
+      <div className="loader-text">Memuat Balancify Quest…</div>
+      <div className="loader-bar"><div className="loader-fill" /></div>
+    </div>
+  );
+}
+
+/* ============================== HERO ============================== */
+function HeroScreen({ onStart }) {
+  const phrases = ["Aset = Liabilitas + Ekuitas", "Debit = Kredit, Selalu!", "Jurnal → Buku Besar → Neraca Saldo", "Siap jadi Akuntan Muda?"];
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [typed, setTyped] = useState('');
+  const [stats, setStats] = useState({ misi: 0, xp: 0, badge: 0 });
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (typed.length < phrases[phraseIdx].length) setTyped(phrases[phraseIdx].slice(0, typed.length + 1));
+      else setTimeout(() => { setPhraseIdx((phraseIdx + 1) % phrases.length); setTyped(''); }, 1400);
+    }, 55);
+    return () => clearTimeout(t);
+  }, [typed, phraseIdx]);
+
+  useEffect(() => {
+    const targets = { misi: 5, xp: 740, badge: 6 };
+    const t0 = performance.now();
+    function frame(now) {
+      const p = Math.min(1, (now - t0) / 1200);
+      setStats({
+        misi: Math.round(targets.misi * p),
+        xp: Math.round(targets.xp * p),
+        badge: Math.round(targets.badge * p),
+      });
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }, []);
+
+  return (
+    <div className="hero fade-in">
+      <img src="logo.png" alt="Balancify" className="hero-logo" onError={(e) => { e.target.replaceWith(Object.assign(document.createElement('div'), { style: 'font-size:90px', marginBottom:20, innerText: '⚖️' })); }} />
+      <h1>Balancify <span className="grad">Quest</span></h1>
+      <p>Petualangan interaktif menaklukkan <strong>siklus akuntansi</strong> — dari Persamaan Dasar sampai Neraca Saldo.</p>
+      <div className="typing">{typed}</div>
+      <div className="hero-stats">
+        <div className="glass hero-stat"><div className="v">{stats.misi}</div><div className="l">Misi</div></div>
+        <div className="glass hero-stat"><div className="v">{stats.xp}</div><div className="l">XP Maksimal</div></div>
+        <div className="glass hero-stat"><div className="v">{stats.badge}</div><div className="l">Badge</div></div>
+      </div>
+      <button className="btn btn-primary" style={{ padding: '16px 40px', fontSize: 16 }} onClick={onStart}>
+        <span className="emoji">🚀 </span>Mulai Petualangan
+      </button>
+    </div>
+  );
+}
+
+/* ============================== DASHBOARD ============================== */
+function Dashboard({ gameState, onOpenMission, onOpenBoss, onReset, onCertificate }) {
+  const { xp, completedMissions, badges } = gameState;
+  const level = Math.floor(xp / 300) + 1;
+  const allMisiDone = completedMissions.length === MISSIONS.length;
+  const progress = Math.round((completedMissions.length / MISSIONS.length) * 100);
+
+  return (
+    <div className="fade-in">
+      <div className="glass topbar">
+        <div className="brand">
+          <img src="logo.png" alt="Balancify" onError={(e) => { e.target.replaceWith(Object.assign(document.createElement('div'), { style: 'font-size:28px', innerText: '⚖️' })); }} />
+          <div className="name">Balancify Quest</div>
+        </div>
+        <div className="topbar-right">
+          <XPBar xp={xp} />
+          <LevelPill xp={xp} level={level} />
+        </div>
+      </div>
+
+      <div className="quest-header">
+        <div>
+          <h2><span className="emoji">🗺️ </span>Peta Petualangan</h2>
+          <p>Selesaikan setiap misi untuk membuka tantangan berikutnya.</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button className="btn btn-ghost" onClick={onReset}>Reset Progress</button>
+          {allMisiDone && <button className="btn btn-gold" onClick={onCertificate}><span className="emoji">🏆 </span>Sertifikat</button>}
+        </div>
+      </div>
+
+      <div className="glass" style={{ padding: 18, marginBottom: 26 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: 0.8 }}>Progress Keseluruhan</span>
+          <span style={{ fontFamily: 'var(--font-head)', fontWeight: 900, fontSize: 22, color: 'var(--indigo)' }}>{progress}%</span>
+        </div>
+        <div className="xp-bar" style={{ height: 12 }}>
+          <div className="xp-fill" style={{ width: progress + '%', background: 'linear-gradient(90deg, var(--indigo), var(--purple))' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+          {badges.length > 0 ? badges.map((b, i) => (
+            <span key={i} className="badge-item gold"><span className="emoji">🏅</span>{b}</span>
+          )) : <span style={{ fontSize: 13, color: 'var(--ink-soft)', fontStyle: 'italic' }}>Belum ada badge. Selesaikan misi untuk mengumpulkannya!</span>}
+        </div>
+      </div>
+
+      <div className="quest-grid">
+        {MISSIONS.map((m, i) => {
+          const unlocked = i === 0 || completedMissions.includes(MISSIONS[i - 1].id);
+          const done = completedMissions.includes(m.id);
+          return (
+            <div key={m.id}
+              className={`glass mission-card ${!unlocked ? 'locked' : ''} ${done ? 'done' : ''}`}
+              onClick={() => unlocked && onOpenMission(m)}>
+              <div className="m-num">{String(m.id).padStart(2, '0')}</div>
+              <div className="m-icon">{m.icon}</div>
+              <h3>{m.title}</h3>
+              <div className="m-desc">{m.desc}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className="m-tag" style={{ background: m.color + '22', color: m.color }}>
+                  {unlocked ? (done ? '✓ Selesai' : '⚡ Tersedia') : '🔒 Terkunci'}
+                </span>
+                <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--gold)' }}>+{m.xp} XP</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="glass mission-card boss" style={{ maxWidth: 500, cursor: allMisiDone ? 'pointer' : 'not-allowed', opacity: allMisiDone ? 1 : 0.6 }}
+        onClick={() => allMisiDone && onOpenBoss()}>
+        <div className="m-icon">👑</div>
+        <h3>BOSS CHALLENGE</h3>
+        <div className="m-desc">Ujian Akhir: jurnal 6 transaksi penuh dan buktikan kamu siap jadi Akuntan Muda.</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="m-tag" style={{ background: 'var(--gold-soft)', color: 'var(--amber)' }}>
+            {allMisiDone ? '⚔️ Siap Bertarung' : '🔒 Selesaikan semua misi'}
+          </span>
+          <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--gold)' }}>+500 XP</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== MISSION VIEW (wrapper) ============================== */
+const MATERI = {
+  1: (
+    <>
+      <h3>Apa itu Persamaan Dasar Akuntansi?</h3>
+      <p>Persamaan Dasar Akuntansi (PDA) adalah <strong>jantung</strong> dari seluruh sistem akuntansi. Ia menyatakan bahwa:</p>
+      <div className="callout"><strong>Aset = Liabilitas + Ekuitas</strong><br />Atau dalam bahasa sederhana: semua yang dimiliki perusahaan (aset) berasal dari dua sumber — utang (liabilitas) dan modal pemilik (ekuitas).</div>
+      <h3>Tiga Komponen Utama</h3>
+      <ul>
+        <li><strong>Aset (Harta)</strong> — sumber daya yang dimiliki: Kas, Piutang, Peralatan, Perlengkapan, Gedung.</li>
+        <li><strong>Liabilitas (Utang)</strong> — kewajiban ke pihak lain: Utang Usaha, Utang Bank, Utang Gaji.</li>
+        <li><strong>Ekuitas (Modal)</strong> — hak pemilik: Modal Pemilik, Prive, Laba Ditahan.</li>
+      </ul>
+      <div className="callout gold"><strong>💡 Catatan penting:</strong> Prive (pengambilan pribadi pemilik) mengurangi ekuitas, sehingga masuk kategori Ekuitas walau saldo normalnya Debit.</div>
+      <h3>Pendapatan & Beban</h3>
+      <p>Pendapatan menambah ekuitas, beban mengurangi ekuitas. Keduanya tetap bagian dari "Ekuitas" yang diperluas.</p>
+    </>
+  ),
+  2: (
+    <>
+      <h3>Saldo Normal: Aturan Emas Debit & Kredit</h3>
+      <p>Setiap akun punya "rumah" alami — disebut <strong>saldo normal</strong>. Kalau ditaruh di rumahnya, nilainya <em>bertambah</em>. Kalau di seberang, <em>berkurang</em>.</p>
+      <table>
+        <thead><tr><th>Kategori</th><th>Saldo Normal</th><th>Bertambah saat…</th></tr></thead>
+        <tbody>
+          <tr><td>Aset</td><td className="mono">DEBIT</td><td>Didebit</td></tr>
+          <tr><td>Liabilitas</td><td className="mono">KREDIT</td><td>Dikredit</td></tr>
+          <tr><td>Ekuitas</td><td className="mono">KREDIT</td><td>Dikredit</td></tr>
+          <tr><td>Pendapatan</td><td className="mono">KREDIT</td><td>Dikredit</td></tr>
+          <tr><td>Beban</td><td className="mono">DEBIT</td><td>Didebit</td></tr>
+        </tbody>
+      </table>
+      <div className="callout green"><strong>🧠 Hafalan mudah:</strong> "A-B-E-P-B" → Aset & Beban = <strong>Debit</strong>. Liabilitas, Ekuitas, Pendapatan = <strong>Kredit</strong>. (Prive & Akum. Penyusutan adalah pengecualian kontra.)</div>
+    </>
+  ),
+  3: (
+    <>
+      <h3>Jurnal Umum: Merekam Transaksi</h3>
+      <p>Setelah menganalisis bukti transaksi, langkah berikutnya adalah <strong>mencatat ke jurnal umum</strong> dengan kaidah <em>double-entry</em>: setiap transaksi melibatkan minimal 2 akun, dan <strong>total debit = total kredit</strong>.</p>
+      <h3>Format Jurnal Standar</h3>
+      <table>
+        <thead><tr><th>Tanggal</th><th>Akun & Keterangan</th><th>Debit</th><th>Kredit</th></tr></thead>
+        <tbody>
+          <tr><td>2 Jan</td><td>Kas</td><td className="mono">20.000.000</td><td>-</td></tr>
+          <tr><td></td><td style={{ paddingLeft: 24 }}>Modal Pemilik</td><td>-</td><td className="mono">20.000.000</td></tr>
+        </tbody>
+      </table>
+      <div className="callout"><strong>Aturan menjurnal:</strong><br />1) Identifikasi akun yang terpengaruh. 2) Tentukan bertambah/berkurang. 3) Terjemahkan ke Debit/Kredit berdasarkan saldo normal. 4) Pastikan total Debit = total Kredit.</div>
+    </>
+  ),
+  4: (
+    <>
+      <h3>Buku Besar & Neraca Saldo</h3>
+      <p>Setelah dijurnal, transaksi dipindahkan (posting) ke <strong>Buku Besar</strong> — buku per akun yang menampilkan mutasi debit/kredit dan saldo berjalan.</p>
+      <h3>Neraca Saldo (Trial Balance)</h3>
+      <p>Neraca Saldo adalah ringkasan semua akun beserta saldo akhirnya. Fungsinya: memastikan <strong>total debit = total kredit</strong>. Kalau tidak seimbang, berarti ada kesalahan pencatatan.</p>
+      <div className="callout gold"><strong>⚠️ Penting:</strong> Neraca saldo yang seimbang <em>belum tentu benar</em> (bisa ada salah akun yang tetap balance), tapi neraca yang <em>tidak</em> seimbang <em>pasti</em> ada error.</div>
+      <h3>Alur Lengkap</h3>
+      <p>Bukti Transaksi ➜ Jurnal Umum ➜ Buku Besar ➜ Neraca Saldo ➜ Laporan Keuangan.</p>
+    </>
+  ),
+  5: (
+    <>
+      <h3>Studi Kasus: Salon Cantika</h3>
+      <p>Bu Cantika membuka usaha salon baru. Modal awal Rp 25.000.000 tunai. Selama Februari 2024, terjadi 6 transaksi — mulai dari beli peralatan hingga bayar gaji.</p>
+      <p>Tugasmu: <strong>menjurnal seluruh transaksi secara berurutan</strong> dan memastikan Neraca Saldo akhir seimbang.</p>
+      <div className="callout green"><strong>Tips:</strong> Gunakan tombol "Simpan Entri" hanya kalau kamu sudah yakin dengan akun debit, kredit, dan nominalnya. Setiap kesalahan akan terdeteksi sistem secara real-time.</div>
+      <h3>Kunci Sukses</h3>
+      <ul>
+        <li>Analisis dulu: akun apa yang bertambah, akun apa yang berkurang.</li>
+        <li>Terjemahkan ke Debit/Kredit sesuai saldo normal.</li>
+        <li>Cek saldo berjalan di Neraca Saldo Live — kalau semua seimbang, kamu lulus!</li>
+      </ul>
+    </>
+  ),
+};
+
+function MissionView({ mission, onBack, onComplete, muted }) {
+  const [step, setStep] = useState(0); // 0=materi, 1=latihan, 2=kuis, 3=result
+  const [exerciseScore, setExerciseScore] = useState(null);
+  const [quizIdx, setQuizIdx] = useState(0);
+  const [picked, setPicked] = useState(null);
+  const [quizScore, setQuizScore] = useState(0);
+  const [finalScore, setFinalScore] = useState(null);
+
+  const quiz = MISSION_QUIZ[mission.id] || [];
+  const handleExerciseDone = (score) => { setExerciseScore(score); playSfx('xp', muted); setTimeout(() => setStep(2), 400); };
+
+  const pickQuiz = (i) => {
+    if (picked !== null) return;
+    setPicked(i);
+    const ok = i === quiz[quizIdx].a;
+    playSfx(ok ? 'correct' : 'wrong', muted);
+    if (ok) setQuizScore(quizScore + 1);
+    setTimeout(() => {
+      setPicked(null);
+      if (quizIdx + 1 < quiz.length) setQuizIdx(quizIdx + 1);
+      else {
+        const fs = ok ? quizScore + 1 : quizScore;
+        const total = Math.round(((exerciseScore || 0) + (fs / quiz.length) * 100) / 2);
+        setFinalScore(total);
+        playSfx('complete', muted);
+        fireConfetti();
+        onComplete(total);
+        setStep(3);
+      }
+    }, 1400);
+  };
+
+  return (
+    <div className="fade-in">
+      <div className="glass topbar">
+        <div className="brand">
+          <button className="btn btn-ghost" onClick={onBack}>← Peta</button>
+        </div>
+        <div className="topbar-right">
+          <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--ink-soft)' }}>Misi {mission.id} / 5</span>
+        </div>
+      </div>
+
+      <div className="glass mission-view">
+        <div className="mission-head">
+          <div className="mh-icon">{mission.icon}</div>
+          <div>
+            <h2>{mission.title}</h2>
+            <div className="mh-sub">{mission.subtitle}</div>
+          </div>
+        </div>
+
+        <div className="mission-progress-steps">
+          <div className={`mstep ${step === 0 ? 'active' : step > 0 ? 'done' : ''}`}><span>1.</span>📖 Materi</div>
+          <div className={`mstep ${step === 1 ? 'active' : step > 1 ? 'done' : ''}`}><span>2.</span>🎮 Latihan</div>
+          <div className={`mstep ${step === 2 ? 'active' : step > 2 ? 'done' : ''}`}><span>3.</span>🎯 Kuis</div>
+          <div className={`mstep ${step === 3 ? 'active' : ''}`}><span>4.</span>🏆 Hasil</div>
+        </div>
+
+        {step === 0 && (
+          <div className="fade-in">
+            <div className="materi-content">{MATERI[mission.id]}</div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 24 }}>
+              <button className="btn btn-primary" onClick={() => setStep(1)}>Lanjut ke Latihan →</button>
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="fade-in">
+            {mission.id === 1 && <Misi1PDA onComplete={handleExerciseDone} muted={muted} />}
+            {mission.id === 2 && <Misi2SaldoNormal onComplete={handleExerciseDone} muted={muted} />}
+            {mission.id === 3 && <Misi3Jurnal onComplete={handleExerciseDone} muted={muted} />}
+            {mission.id === 4 && <Misi4Ledger onComplete={handleExerciseDone} muted={muted} />}
+            {mission.id === 5 && <Misi5FullSim onComplete={handleExerciseDone} muted={muted} isBoss={false} />}
+          </div>
+        )}
+
+        {step === 2 && quiz.length > 0 && (
+          <div className="fade-in">
+            <div className="glass quiz-wrap" style={{ background: 'transparent', boxShadow: 'none', border: 'none', padding: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 900, color: 'var(--indigo)', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Kuis {quizIdx + 1} / {quiz.length}
+              </div>
+              <div className="quiz-q">{quiz[quizIdx].q}</div>
+              {quiz[quizIdx].opts.map((o, i) => (
+                <div key={i}
+                  className={`quiz-opt ${picked !== null ? 'disabled' : ''} ${picked !== null && i === quiz[quizIdx].a ? 'correct' : ''} ${picked === i && i !== quiz[quizIdx].a ? 'wrong' : ''}`}
+                  onClick={() => pickQuiz(i)}>
+                  <div className="mark">{String.fromCharCode(65 + i)}</div>
+                  <div>{o}</div>
+                </div>
+              ))}
+              {picked !== null && (
+                <div className={`quiz-feedback ${picked === quiz[quizIdx].a ? 'ok' : 'no'}`}>
+                  <strong>{picked === quiz[quizIdx].a ? '✓ Benar! ' : '✗ Belum tepat. '}</strong>
+                  {quiz[quizIdx].exp}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="result-panel fade-in">
+            <div style={{ fontSize: 60 }}>🎉</div>
+            <h2>Misi Selesai!</h2>
+            <p className="sub">Skor akhir misi ini:</p>
+            <div className="result-xp">{finalScore}%</div>
+            <div className="badge-grid">
+              <div className="badge-item gold"><span className="emoji">⭐</span>+{mission.xp} XP</div>
+              <div className="badge-item"><span className="emoji">🏅</span>Badge: {mission.title}</div>
+            </div>
+            <button className="btn btn-primary" onClick={onBack}>Kembali ke Peta →</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================== QUIZ DATA ============================== */
+const MISSION_QUIZ = {
+  1: [
+    { q: "Rumus Persamaan Dasar Akuntansi adalah…", opts: ["Aset = Liabilitas + Ekuitas", "Aset + Liabilitas = Ekuitas", "Aset = Liabilitas − Ekuitas", "Aset + Ekuitas = Liabilitas"], a: 0, exp: "PDA menyatakan Aset = Liabilitas + Ekuitas. Semua yang dimiliki berasal dari utang atau modal." },
+    { q: "Manakah yang termasuk Ekuitas?", opts: ["Utang Bank", "Piutang Usaha", "Modal Pemilik", "Peralatan"], a: 2, exp: "Modal Pemilik dan Prive termasuk Ekuitas. Utang Bank = Liabilitas, Piutang & Peralatan = Aset." },
+    { q: "Jika Aset Rp 50jt dan Liabilitas Rp 20jt, maka Ekuitas = …", opts: ["Rp 70jt", "Rp 30jt", "Rp 20jt", "Rp 50jt"], a: 1, exp: "Ekuitas = Aset − Liabilitas = 50 − 20 = Rp 30.000.000." },
+  ],
+  2: [
+    { q: "Akun Beban Gaji memiliki saldo normal…", opts: ["Debit", "Kredit", "Tergantung transaksi", "Tidak punya"], a: 0, exp: "Beban adalah kelompok Debit. Setiap kenaikan beban dicatat di debit." },
+    { q: "Pendapatan Jasa bertambah dicatat sebagai…", opts: ["Debit", "Kredit", "Kanan-kiri", "Bebas"], a: 1, exp: "Pendapatan bersaldo normal Kredit. Jadi saat bertambah, di sisi kredit." },
+    { q: "Akun berikut yang bersaldo normal KREDIT adalah…", opts: ["Kas", "Piutang", "Utang Usaha", "Beban Listrik"], a: 2, exp: "Utang Usaha adalah Liabilitas, bersaldo normal Kredit." },
+  ],
+  3: [
+    { q: "Total DEBIT dalam satu jurnal harus selalu…", opts: ["Lebih kecil dari kredit", "Sama dengan total kredit", "Lebih besar dari kredit", "Bebas"], a: 1, exp: "Kaidah double-entry: total debit = total kredit. Kalau tidak sama, jurnal tidak valid." },
+    { q: "Membeli peralatan tunai Rp 5jt. Akun yang di-DEBIT adalah…", opts: ["Kas", "Peralatan", "Modal", "Utang"], a: 1, exp: "Peralatan (Aset) bertambah → didebit. Kas (Aset) berkurang → dikredit." },
+    { q: "Menerima pendapatan tunai Rp 3jt akan…", opts: ["Menambah Kas (D) & Pendapatan (K)", "Menambah Kas (K) & Pendapatan (D)", "Mengurangi Kas", "Tidak berpengaruh"], a: 0, exp: "Kas bertambah → Debit. Pendapatan bertambah → Kredit." },
+  ],
+  4: [
+    { q: "Fungsi utama Neraca Saldo adalah…", opts: ["Menghitung pajak", "Memastikan total debit = total kredit", "Membuat laporan laba rugi", "Menghitung penyusutan"], a: 1, exp: "Neraca Saldo (Trial Balance) adalah alat validasi: cek apakah debit & kredit sudah seimbang." },
+    { q: "Kalau neraca saldo tidak seimbang, artinya…", opts: ["Pasti ada kesalahan pencatatan", "Perusahaan untung", "Tidak apa-apa", "Wajar"], a: 0, exp: "Tidak seimbang = pasti ada error. Neraca saldo seimbang belum tentu benar, tapi yang tidak seimbang pasti salah." },
+    { q: "Buku Besar menampilkan…", opts: ["Hanya total akhir", "Mutasi tiap akun dari waktu ke waktu", "Semua transaksi sekali", "Fotokopi jurnal"], a: 1, exp: "Buku Besar menunjukkan riwayat mutasi (debit/kredit) tiap akun dan saldo berjalannya." },
+  ],
+  5: [
+    { q: "Di Salon Cantika, jika semua transaksi dijurnal dengan benar, maka…", opts: ["Neraca Saldo seimbang", "Saldo kas negatif", "Total debit > kredit", "Tidak ada transaksi"], a: 0, exp: "Setiap jurnal double-entry → total debit = total kredit → Neraca Saldo seimbang." },
+    { q: "Membayar gaji karyawan secara tunai berdampak…", opts: ["Kas naik, Beban naik", "Kas turun, Beban naik", "Kas naik, Beban turun", "Tidak berpengaruh"], a: 1, exp: "Kas (Aset) berkurang → Kredit. Beban Gaji bertambah → Debit." },
+    { q: "Kalau satu transaksi salah nominal, apa yang harus dilakukan?", opts: ["Biarkan", "Hapus & jurnal ulang dengan benar", "Tambah transaksi palsu", "Ubah laporan"], a: 1, exp: "Perbaiki dengan menghapus entri salah dan menjurnal ulang. Ini bagian dari troubleshooting." },
+  ],
+};
+
+/* ============================== BOSS SCREEN ============================== */
+function BossScreen({ onBack, onComplete, muted }) {
+  const [done, setDone] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
+  const handleBossDone = (score) => {
+    setFinalScore(score); setDone(true);
+    playSfx('complete', muted); fireConfetti();
+    setTimeout(() => onComplete(500, score), 800);
+  };
+  return (
+    <div className="fade-in">
+      <div className="glass topbar">
+        <div className="brand"><button className="btn btn-ghost" onClick={onBack}>← Peta</button></div>
+        <div className="topbar-right"><span style={{ fontSize: 13, fontWeight: 800, color: 'var(--gold)' }}>👑 BOSS CHALLENGE</span></div>
+      </div>
+      <div className="glass mission-view">
+        <div className="mission-head">
+          <div className="mh-icon">👑</div>
+          <div>
+            <h2>Ujian Akhir: Boss Challenge</h2>
+            <div className="mh-sub">Buktikan penguasaanmu di seluruh siklus akuntansi</div>
+          </div>
+        </div>
+        {!done ? <Misi5FullSim onComplete={handleBossDone} muted={muted} isBoss={true} /> : (
+          <div className="result-panel fade-in">
+            <div style={{ fontSize: 70 }}>👑</div>
+            <h2>BOSS DIKALAHKAN!</h2>
+            <p className="sub">Skor akhir ujian:</p>
+            <div className="result-xp">{finalScore}%</div>
+            <div className="badge-grid">
+              <div className="badge-item gold"><span className="emoji">🏆</span>+500 XP</div>
+              <div className="badge-item gold"><span className="emoji">👑</span>Badge: Master Akuntan Muda</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================== CERTIFICATE MODAL ============================== */
+function CertificateModal({ gameState, onClose }) {
+  const [name, setName] = useState('');
+  const level = Math.floor(gameState.xp / 300) + 1;
+  return (
+    <div className="backdrop" onClick={onClose}>
+      <div className="glass modal" onClick={e => e.stopPropagation()}>
+        <h2 style={{ fontFamily: 'var(--font-head)', fontSize: 26, fontWeight: 900, marginBottom: 6 }}>🏆 Sertifikat Kelulusan</h2>
+        <p style={{ color: 'var(--ink-soft)', fontSize: 14, marginBottom: 20 }}>Selamat! Kamu berhasil menaklukkan semua misi.</p>
+        <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 }}>Nama Peserta</label>
+        <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Nama lengkapmu" autoFocus />
+        <div style={{ display: 'flex', gap: 10, marginTop: 22, justifyContent: 'flex-end' }}>
+          <button className="btn btn-ghost" onClick={onClose}>Batal</button>
+          <button className="btn btn-gold" disabled={!name.trim()}
+            onClick={() => { downloadCertificate({ name, xp: gameState.xp, level, badges: gameState.badges.length }); onClose(); }}>
+            <span className="emoji">📜 </span>Unduh PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================== APP ============================== */
+const DEFAULT_STATE = { xp: 0, completedMissions: [], badges: [], streak: 0 };
+
+function App() {
+  const [screen, setScreen] = useState('loader');
+  const [theme, setTheme] = useLocalStorage('balancify_theme', 'quest');
+  const [muted, setMuted] = useLocalStorage('balancify_muted', false);
+  const [gameState, setGameState] = useLocalStorage('balancify_quest', DEFAULT_STATE);
+  const [currentMission, setCurrentMission] = useState(null);
+  const [showCert, setShowCert] = useState(false);
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme === 'profesional' ? 'profesional' : 'quest');
+  }, [theme]);
+
+  useEffect(() => {
+    if (screen === 'loader') {
+      const t = setTimeout(() => setScreen(gameState.xp > 0 ? 'dashboard' : 'hero'), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [screen, gameState.xp]);
+
+  const unlockMission = (missionId, xpGained, score) => {
+    setGameState(prev => {
+      const already = prev.completedMissions.includes(missionId);
+      const newBadges = [...prev.badges];
+      if (!already) {
+        const m = MISSIONS.find(m => m.id === missionId);
+        if (m) newBadges.push(m.title);
+      }
+      return {
+        xp: prev.xp + (already ? 0 : xpGained),
+        completedMissions: already ? prev.completedMissions : [...prev.completedMissions, missionId],
+        badges: newBadges,
+        streak: prev.streak + 1,
+      };
+    });
+  };
+
+  const unlockBoss = (xpGained, score) => {
+    setGameState(prev => {
+      const newBadges = prev.badges.includes('Master Akuntan Muda') ? prev.badges : [...prev.badges, 'Master Akuntan Muda'];
+      return { ...prev, xp: prev.xp + xpGained, badges: newBadges };
+    });
+    setScreen('dashboard');
+    setTimeout(() => setShowCert(true), 400);
+  };
+
+  const resetProgress = () => {
+    if (confirm('Reset semua progress (XP, badge, misi)? Tindakan ini tidak bisa dibatalkan.')) {
+      setGameState(DEFAULT_STATE);
+      setScreen('hero');
+    }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Balancify Quest',
+          text: `Aku sudah kumpulkan ${gameState.xp} XP & ${gameState.badges.length} badge di Balancify Quest!`,
+          url: window.location.href,
+        });
+      } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(window.location.href); alert('Link disalin ke clipboard!'); } catch {}
+    }
+  };
+
+  return (
+    <>
+      {screen === 'loader' && <LoaderScreen />}
+
+      <button className="theme-toggle" onClick={() => { setTheme(theme === 'profesional' ? 'quest' : 'profesional'); playSfx('click', muted); }}>
+        {theme === 'profesional' ? '✨ Mode Quest' : '💼 Mode Profesional'}
+      </button>
+
+      <button className="theme-toggle" style={{ left: 'auto', right: 200, padding: '10px 14px' }}
+        onClick={() => { setMuted(!muted); playSfx('click', false); }} title="Toggle suara">
+        {muted ? '🔇' : '🔊'}
+      </button>
+
+      <div className="container">
+        {screen === 'hero' && <HeroScreen onStart={() => { playSfx('unlock', muted); setScreen('dashboard'); }} />}
+        {screen === 'dashboard' && (
+          <Dashboard
+            gameState={gameState}
+            onOpenMission={(m) => { playSfx('click', muted); setCurrentMission(m); setScreen('mission'); }}
+            onOpenBoss={() => { playSfx('unlock', muted); setScreen('boss'); }}
+            onReset={resetProgress}
+            onCertificate={() => setShowCert(true)}
+          />
+        )}
+        {screen === 'mission' && currentMission && (
+          <MissionView
+            mission={currentMission}
+            onBack={() => setScreen('dashboard')}
+            onComplete={(score) => unlockMission(currentMission.id, currentMission.xp, score)}
+            muted={muted}
+          />
+        )}
+        {screen === 'boss' && (
+          <BossScreen onBack={() => setScreen('dashboard')} onComplete={unlockBoss} muted={muted} />
+        )}
+      </div>
+
+      {showCert && <CertificateModal gameState={gameState} onClose={() => setShowCert(false)} />}
+
+      {/* Floating share button when there's progress */}
+      {gameState.xp > 0 && screen === 'dashboard' && (
+        <button className="theme-toggle" style={{ right: 200, bottom: 20, left: 'auto', padding: '10px 14px' }} onClick={handleShare} title="Bagikan">
+          📤
+        </button>
+      )}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+})();
+</script>
+</body>
+</html>
